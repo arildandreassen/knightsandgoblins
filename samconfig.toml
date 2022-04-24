@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "knightsandgoblins"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-12et7ny6uxrte"
+s3_prefix = "knightsandgoblins"
+region = "us-west-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+image_repositories = []

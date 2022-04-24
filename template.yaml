@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  Lambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: test
+      CodeUri: infrastructure/lambda
+      Handler: index.handler
+      Runtime: nodejs14.x
+      Policies:
+        - AmazonDynamoDBFullAccess
+  
+  DB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Games
+      AttributeDefinitions:
+        - AttributeName: GameId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: GameId
+          KeyType: HASH
+      ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 5
