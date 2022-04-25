@@ -1,27 +1,28 @@
-name: Deploy master
 on:
   push:
     branches:
-    - main
+      - main
+      - dev
 
 jobs:
-  build:
-    runs-on: ubuntu-18.04
+  build-deploy:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: ${{ github.head_ref || github.ref_name }}
+      REGION: us-west-1
     steps:
-
-    - name: Checkout source code
+    - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Generate deployment package
-      run: zip -r deploy.zip client/
-
-    - name: Deploy to EB
-      uses: einaregilsson/beanstalk-deploy@v20
+    - name: Configure AWS credentials
+      id: creds
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        version_label: ${{ github.run_number }}
-        application_name: dev
-        environment_name: dev-env
-        region: us-west-1
-        deployment_package: deploy.zip
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+
+    - name: build
+      run: sam build --use-container 
+
+    - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name knightsandgoblins-${BRANCH} --s3-bucket knightsandgoblins-${BRANCH} --capabilities CAPABILITY_IAM --region us-west-1 --parameter-overrides "BRANCH=${BRANCH}"
