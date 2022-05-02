@@ -26,3 +26,9 @@ jobs:
       run: sam build --use-container 
 
     - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name knightsandgoblins-${BRANCH} --s3-bucket knightsandgoblins-${BRANCH} --capabilities CAPABILITY_IAM --region us-west-1 --parameter-overrides "BRANCH=${BRANCH}"
+    
+    - name: wait for cloudformation
+      uses: intuit/cfn-deploy@master
+      env:
+        AWS_REGION: us-west-1
+        STACK_NAME: knightsandgoblins-${BRANCH}
