@@ -1,27 +1,39 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+  BRANCH:
+    Description: name of the github branch
+    Type: 'String'
+    Default: local
+
+Globals:
+  Function:
+    Runtime: nodejs14.x
+
 Resources:
+
   Lambda:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: test
+      FunctionName: !Sub test-${BRANCH}
       CodeUri: infrastructure/lambda
       Handler: index.handler
-      Runtime: nodejs14.x
       Policies:
-        - AmazonDynamoDBFullAccess
-  
+      - AmazonDynamoDBFullAccess
+    Metadata:
+      SamResourceId: Lambda
+
   DB:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: Games
+      TableName: !Sub Games-${BRANCH}
       AttributeDefinitions:
-        - AttributeName: GameId
-          AttributeType: S
+      - AttributeName: GameId
+        AttributeType: S
       KeySchema:
-        - AttributeName: GameId
-          KeyType: HASH
+      - AttributeName: GameId
+        KeyType: HASH
       ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 5
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 5
